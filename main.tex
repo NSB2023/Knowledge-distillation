@@ -1,0 +1,517 @@
+\documentclass[10pt]{article}
+\usepackage[a4paper,margin=0.75in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{xurl}
+\usepackage[colorlinks=true,urlcolor=blue,linkcolor=blue,citecolor=blue]{hyperref}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{3pt}
+\setlist[itemize]{leftmargin=1.1em,itemsep=2pt,topsep=2pt}
+\sloppy
+\begin{document}
+\begin{center}
+{\LARGE\bfseries Knowledge Distillation in a Nutshell!}\\[6pt]
+{\large Nazmus Sakib Bhuyan}\\[4pt]
+Date: July 7, 2026
+\end{center}
+
+\vspace{4pt}
+
+\section*{What KD means}
+
+Knowledge distillation is a way to train a smaller model by letting it learn from a bigger and stronger model. The big model is called the teacher and the smaller model is called the student. Instead of learning only from the original dataset, the student also learns from the teacher's answers, features, explanations or generated outputs. This makes the student cheaper, faster and easier to use while still keeping much of the teacher's knowledge. In modern AI, KD is also important for LLMs, where models can learn from generated text, reasoning traces or API outputs. This guide is a simple research map of the main KD methods, papers and useful repositories.\par
+
+
+\section*{ KD is now also an AI-security topic}
+In 2026, knowledge distillation became part of a public AI-policy and AI-security debate. Anthropic claimed that DeepSeek, Moonshot and MiniMax used about 24,000 fraudulent accounts and more than 16 million Claude exchanges to extract Claude capabilities; Anthropic later made a separate allegation involving Alibaba/Qwen and about 28.8 million Claude interactions. Google Cloud/GTIG also reported an increase in model extraction or distillation attacks against AI systems. These are claims and security reports, not neutral court-proven facts but they show why KD is now both a research method and a governance issue.\par
+
+\begin{itemize}
+\item Anthropic source: \href{https://www.anthropic.com/news/detecting-and-preventing-distillation-attacks}{\nolinkurl{https://www.anthropic.com/news/detecting-and-preventing-distillation-attacks}}
+\item Google Cloud / GTIG source: \href{https://cloud.google.com/blog/topics/threat-intelligence/distillation-experimentation-integration-ai-adversarial-use}{\nolinkurl{https://cloud.google.com/blog/topics/threat-intelligence/distillation-experimentation-integration-ai-adversarial-use}}
+\item Reuters Alibaba/Anthropic report: \href{https://www.reuters.com/world/china/anthropic-says-alibaba-illicitly-extracted-claude-ai-model-capabilities-2026-06-24/}{\nolinkurl{https://www.reuters.com/world/china/anthropic-says-alibaba-illicitly-extracted-claude-ai-model-capabilities-2026-06-24/}}
+\end{itemize}
+
+
+
+\section*{Types of Knowledge Distillation}
+
+KD methods do not follow one fixed official list. In this guide, I use 18 simple KD types, F1 to F18, to organize the field. These are category labels, not separate papers. The 54 entries later are real papers, repos, model releases, or reading lists, and each one is mapped to one or more KD types.\par
+
+\begin{itemize}
+
+\item \textbf{F1. Response/logit KD} - student learns from teacher output probabilities or logits. 
+\textbf{Mapped entries:} 1, 2, 10, 16, 20, 21, 23, 24, 26, 28.
+
+\item \textbf{F2. Feature KD} - student mimics intermediate hidden representations from the teacher. 
+\textbf{Mapped entries:} 4, 7, 8, 9, 24, 25, 26, 28, 44.
+
+\item \textbf{F3. Attention KD} - student learns where the teacher focuses. 
+\textbf{Mapped entries:} 5, 11, 24, 27, 42, 43.
+
+\item \textbf{F4. Relational/structural KD} - student learns relationships between samples or features. 
+\textbf{Mapped entries:} 6, 27, 43, 45.
+
+\item \textbf{F5. Contrastive KD} - student learns teacher representations using contrastive learning. 
+\textbf{Mapped entries:} 7.
+
+\item \textbf{F6. Self-KD} - a model teaches itself or later generations of itself. 
+\textbf{Mapped entries:} 12.
+
+\item \textbf{F7. Online/mutual KD} - multiple students train together and teach each other. 
+\textbf{Mapped entries:} 13.
+
+\item \textbf{F8. Teacher-assistant KD} - intermediate models bridge a large teacher-student capacity gap. 
+\textbf{Mapped entries:} 14, 15.
+
+\item \textbf{F9. Data-free / zero-shot KD} - student is trained without original training data, often using synthetic data. 
+\textbf{Mapped entries:} 16, 17, 18, 19, 20, 22.
+
+\item \textbf{F10. Privacy-preserving KD} - teacher ensembles transfer knowledge with privacy controls. 
+\textbf{Mapped entries:} 21, 22.
+
+\item \textbf{F11. Sequence-level KD} - student learns full generated sequences, not just token-level labels. 
+\textbf{Mapped entries:} 3.
+
+\item \textbf{F12. Transformer/BERT KD} - large pretrained language models are compressed into smaller transformers. 
+\textbf{Mapped entries:} 23, 24, 25, 26, 27, 28, 29, 39, 42.
+
+\item \textbf{F13. LLM black-box KD} - student learns from text produced by a closed teacher API or another unavailable teacher. 
+\textbf{Mapped entries:} 30, 31, 32, 33, 36, 37, 38, 41.
+
+\item \textbf{F14. LLM white-box/on-policy KD} - student can access teacher probabilities or trains on its own generated states. 
+\textbf{Mapped entries:} 34, 35, 38.
+
+\item \textbf{F15. Rationale/reasoning KD} - student learns answers plus explanations or reasoning traces. 
+\textbf{Mapped entries:} 30, 33, 39, 40, 41.
+
+\item \textbf{F16. Vision/detection/segmentation KD} - KD adapted for images, detectors, dense prediction, and ViTs. 
+\textbf{Mapped entries:} 8, 9, 11, 16, 17, 19, 42, 43, 44, 45.
+
+\item \textbf{F17. Diffusion-model KD} - slow generative diffusion models are distilled into faster samplers. 
+\textbf{Mapped entries:} 46, 47, 48, 49.
+
+\item \textbf{F18. Toolkits and benchmark repos} - reusable frameworks and reading lists that implement or organize multiple KD methods. 
+\textbf{Mapped entries:} 38, 40, 50, 51, 52, 53, 54.
+
+\end{itemize}
+
+Some entries appear in more than one type because they combine methods. For example, TinyBERT is mainly Transformer/BERT KD, but it also uses feature, attention, and prediction-level transfer. Distilling Step-by-Step is mainly rationale KD, but it also works like an LLM black-box distillation workflow.\par
+
+\section*{Representative papers, repos, simple summaries and KD map tags}
+\subsection*{1. Model Compression}
+Type: Early model compression / pre-KD foundation\par
+\textbf{KD map:} F1 Response/logit KD.\par
+Simple summary: This early paper showed that a large ensemble can be compressed into a smaller neural network by training the smaller model to imitate the ensemble's predictions. It is one of the roots of modern KD.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://www.cs.cornell.edu/~caruana/compression.kdd06.pdf}{\nolinkurl{https://www.cs.cornell.edu/~caruana/compression.kdd06.pdf}}\par
+\textcolor{blue}{\textbf{Link:}} No verified official code repo found.\par
+
+\subsection*{2. Distilling the Knowledge in a Neural Network}
+Type: Classical soft-label / logit KD\par
+\textbf{KD map:} F1 Response/logit KD.\par
+Simple summary: This is the famous Hinton KD paper. It trains a small student using softened class probabilities from a larger teacher or ensemble, so the student learns dark knowledge about class similarity.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://arxiv.org/abs/1503.02531}{\nolinkurl{https://arxiv.org/abs/1503.02531}}\par
+\textcolor{blue}{\textbf{Link:}} No verified official code repo found.\par
+
+\subsection*{3. Sequence-Level Knowledge Distillation}
+Type: Sequence-level KD for neural machine translation\par
+\textbf{KD map:} F11 Sequence-level KD.\par
+Simple summary: Instead of only teaching each next-token prediction, this work teaches a smaller translation model from full sequences generated by the teacher. The student becomes much faster while keeping strong translation quality.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://aclanthology.org/D16-1139/}{\nolinkurl{https://aclanthology.org/D16-1139/}}\par
+\textcolor{blue}{\textbf{Link:}} \href{https://github.com/paechi/knowledge-distillation-seq}{\nolinkurl{https://github.com/paechi/knowledge-distillation-seq}} (Unofficial implementation)\par
+
+\subsection*{4. FitNets: Hints for Thin Deep Nets}
+Type: Feature / hint-based KD\par
+\textbf{KD map:} F2 Feature KD.\par
+Simple summary: FitNets uses intermediate feature maps from a large teacher as hints to train a thinner and deeper student. It helped popularize feature-level supervision, not just output-level KD.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://arxiv.org/abs/1412.6550}{\nolinkurl{https://arxiv.org/abs/1412.6550}}\par
+\textcolor{blue}{\textbf{Link:}} \href{https://github.com/adri-romsor/FitNets}{\nolinkurl{https://github.com/adri-romsor/FitNets}}\par
+
+\subsection*{5. Paying More Attention to Attention}
+Type: Attention transfer\par
+\textbf{KD map:} F3 Attention KD.\par
+Simple summary: This paper transfers attention maps from the teacher to the student. In simple terms, it teaches the student not only what answer to give but also where to look inside the image representation.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://arxiv.org/abs/1612.03928}{\nolinkurl{https://arxiv.org/abs/1612.03928}}\par
+\textcolor{blue}{\textbf{Link:}} \href{https://github.com/szagoruyko/attention-transfer}{\nolinkurl{https://github.com/szagoruyko/attention-transfer}}\par
+
+\subsection*{6. Relational Knowledge Distillation (RKD)}
+Type: Relational / structural KD\par
+\textbf{KD map:} F4 Relational/structural KD.\par
+Simple summary: RKD teaches the student to preserve relationships between examples, such as distances and angles in representation space. This is useful when the structure between samples matters more than individual logits.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://arxiv.org/abs/1904.05068}{\nolinkurl{https://arxiv.org/abs/1904.05068}}\par
+\textcolor{blue}{\textbf{Link:}} \href{https://github.com/lenscloth/RKD}{\nolinkurl{https://github.com/lenscloth/RKD}}\par
+
+\subsection*{7. Contrastive Representation Distillation (CRD)}
+Type: Contrastive KD\par
+\textbf{KD map:} F5 Contrastive KD; F2 Feature KD.\par
+Simple summary: CRD connects KD with contrastive representation learning. The student learns to keep teacher-student representations close for matching examples and separated for non-matching examples.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://arxiv.org/abs/1910.10699}{\nolinkurl{https://arxiv.org/abs/1910.10699}}\par
+\textcolor{blue}{\textbf{Link:}} \href{https://github.com/HobbitLong/RepDistiller}{\nolinkurl{https://github.com/HobbitLong/RepDistiller}}\par
+
+\subsection*{8. A Comprehensive Overhaul of Feature Distillation (OFD)}
+Type: Improved feature KD\par
+\textbf{KD map:} F2 Feature KD; F16 Vision KD.\par
+Simple summary: This work studies where and how feature distillation should be applied, then proposes better feature transforms and loss design. It is a strong reference for vision feature distillation.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://arxiv.org/abs/1904.01866}{\nolinkurl{https://arxiv.org/abs/1904.01866}}\par
+\textcolor{blue}{\textbf{Link:}} \href{https://github.com/clovaai/overhaul-distillation}{\nolinkurl{https://github.com/clovaai/overhaul-distillation}}\par
+
+\subsection*{9. Distilling Knowledge via Knowledge Review (ReviewKD)}
+Type: Multi-layer feature review KD\par
+\textbf{KD map:} F2 Feature KD; F16 Vision KD.\par
+Simple summary: ReviewKD lets the student review and combine teacher features across multiple stages instead of copying one layer at a time. It improves transfer from deeper teacher layers to lighter students.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://openaccess.thecvf.com/content/CVPR2021/papers/Chen_Distilling_Knowledge_via_Knowledge_Review_CVPR_2021_paper.pdf}{\nolinkurl{https://openaccess.thecvf.com/content/CVPR2021/papers/Chen_Distilling_Knowledge_via_Knowledge_Review_CVPR_2021_paper.pdf}}\par
+\textcolor{blue}{\textbf{Link:}} \href{https://github.com/JIA-Lab-research/ReviewKD}{\nolinkurl{https://github.com/JIA-Lab-research/ReviewKD}}\par
+
+\subsection*{10. Decoupled Knowledge Distillation (DKD)}
+Type: Decoupled logit KD\par
+\textbf{KD map:} F1 Response/logit KD.\par
+Simple summary: DKD separates target-class knowledge and non-target-class knowledge. This explains why normal logit KD works and gives better control over what the student learns from teacher probabilities.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://arxiv.org/abs/2203.08679}{\nolinkurl{https://arxiv.org/abs/2203.08679}}\par
+\textcolor{blue}{\textbf{Link:}} \href{https://github.com/megvii-research/mdistiller}{\nolinkurl{https://github.com/megvii-research/mdistiller}}\par
+
+\subsection*{11. Class Attention Transfer Based KD (CAT-KD)}
+Type: Interpretable attention/class activation KD\par
+\textbf{KD map:} F3 Attention KD; F16 Vision KD.\par
+Simple summary: CAT-KD transfers class activation maps so the student learns class-discriminative regions from the teacher. It focuses on making KD more interpretable for CNN image classification.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://arxiv.org/abs/2304.12777}{\nolinkurl{https://arxiv.org/abs/2304.12777}}\par
+\textcolor{blue}{\textbf{Link:}} \href{https://github.com/GzyAftermath/CAT-KD}{\nolinkurl{https://github.com/GzyAftermath/CAT-KD}}\par
+
+\subsection*{12. Born Again Neural Networks (BANs)}
+Type: Self-distillation / generation-to-generation KD\par
+\textbf{KD map:} F6 Self-KD; F1 Response/logit KD.\par
+Simple summary: A student with the same architecture as the teacher is trained from teacher predictions and can outperform the teacher. Repeating this process creates generations of students, like a model teaching its next version.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://proceedings.mlr.press/v80/furlanello18a.html}{\nolinkurl{https://proceedings.mlr.press/v80/furlanello18a.html}}\par
+\textcolor{blue}{\textbf{Link:}} No verified official code repo found.\par
+
+\subsection*{13. Deep Mutual Learning (DML)}
+Type: Online / mutual KD\par
+\textbf{KD map:} F7 Online/mutual KD.\par
+Simple summary: DML removes the fixed teacher. Several student networks train at the same time and learn from each other's predictions, so the group improves collaboratively.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://arxiv.org/abs/1706.00384}{\nolinkurl{https://arxiv.org/abs/1706.00384}}\par
+\textcolor{blue}{\textbf{Link:}} \href{https://github.com/YingZhangDUT/Deep-Mutual-Learning}{\nolinkurl{https://github.com/YingZhangDUT/Deep-Mutual-Learning}}\par
+
+\subsection*{14. Improved Knowledge Distillation via Teacher Assistant}
+Type: Teacher-assistant KD\par
+\textbf{KD map:} F8 Teacher-assistant KD.\par
+Simple summary: When the teacher is too large and the student too small, the capacity gap hurts transfer. This paper adds one or more medium-size teacher assistants between them.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://arxiv.org/abs/1902.03393}{\nolinkurl{https://arxiv.org/abs/1902.03393}}\par
+\textcolor{blue}{\textbf{Link:}} \href{https://github.com/imirzadeh/Teacher-Assistant-Knowledge-Distillation}{\nolinkurl{https://github.com/imirzadeh/Teacher-Assistant-Knowledge-Distillation}}\par
+
+\subsection*{15. Densely Guided KD Using Multiple Teacher Assistants}
+Type: Multi-assistant KD\par
+\textbf{KD map:} F8 Teacher-assistant KD.\par
+Simple summary: This extends teacher-assistant KD by using multiple assistant models and dense guidance. The student can learn from a smoother chain of teachers rather than one huge jump.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://arxiv.org/abs/2009.08825}{\nolinkurl{https://arxiv.org/abs/2009.08825}}\par
+\textcolor{blue}{\textbf{Link:}} No verified official code repo found.\par
+
+\subsection*{16. Data-Free Learning of Student Networks (DAFL)}
+Type: Data-free KD using generated images\par
+\textbf{KD map:} F9 Data-free KD; F1 Response/logit KD; F16 Vision KD.\par
+Simple summary: DAFL trains a student without the original training data. It uses a generator to synthesize images that activate the teacher, then distills the teacher's knowledge on those synthetic images.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://arxiv.org/abs/1904.01186}{\nolinkurl{https://arxiv.org/abs/1904.01186}}\par
+\textcolor{blue}{\textbf{Link:}} \href{https://github.com/autogyro/DAFL}{\nolinkurl{https://github.com/autogyro/DAFL}}\par
+
+\subsection*{17. Dreaming to Distill: DeepInversion}
+Type: Data-free KD via model inversion\par
+\textbf{KD map:} F9 Data-free KD; F16 Vision KD.\par
+Simple summary: DeepInversion synthesizes class-like images directly from a trained teacher by using batch-normalization statistics. Those dream images can then train or distill a student without real data.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://arxiv.org/abs/1912.08795}{\nolinkurl{https://arxiv.org/abs/1912.08795}}\par
+\textcolor{blue}{\textbf{Link:}} \href{https://github.com/NVlabs/DeepInversion}{\nolinkurl{https://github.com/NVlabs/DeepInversion}}\par
+
+\subsection*{18. ZeroQ}
+Type: Zero-shot quantization + distilled synthetic data\par
+\textbf{KD map:} F9 Data-free KD.\par
+Simple summary: ZeroQ creates a small synthetic distilled dataset using batch-norm statistics, then uses it for mixed-precision quantization without original data. It is important for deployment when data is private or unavailable.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://arxiv.org/abs/2001.00281}{\nolinkurl{https://arxiv.org/abs/2001.00281}}\par
+\textcolor{blue}{\textbf{Link:}} \href{https://github.com/amirgholami/ZeroQ}{\nolinkurl{https://github.com/amirgholami/ZeroQ}}\par
+
+\subsection*{19. Fast Data-Free Knowledge Distillation (FastDFKD)}
+Type: Fast data-free KD\par
+\textbf{KD map:} F9 Data-free KD; F16 Vision KD.\par
+Simple summary: FastDFKD tries to make data-free KD much faster by reusing shared synthetic features instead of independently optimizing every synthetic sample from scratch.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://ojs.aaai.org/index.php/AAAI/article/view/20613}{\nolinkurl{https://ojs.aaai.org/index.php/AAAI/article/view/20613}}\par
+\textcolor{blue}{\textbf{Link:}} \href{https://github.com/zju-vipa/Fast-Datafree}{\nolinkurl{https://github.com/zju-vipa/Fast-Datafree}}\par
+
+\subsection*{20. Data-Free Network Quantization with Adversarial KD}
+Type: Adversarial data-free KD for quantization\par
+\textbf{KD map:} F9 Data-free KD; F1 Response/logit KD.\par
+Simple summary: This paper uses a generator to create adversarial synthetic data for a teacher and quantized student. The goal is to recover model accuracy after quantization without access to original training data.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://arxiv.org/abs/2005.04136}{\nolinkurl{https://arxiv.org/abs/2005.04136}}\par
+\textcolor{blue}{\textbf{Link:}} No verified official code repo found.\par
+
+\subsection*{21. Private Aggregation of Teacher Ensembles (PATE)}
+Type: Privacy-preserving teacher ensemble KD\par
+\textbf{KD map:} F10 Privacy-preserving KD; F1 Response/logit KD.\par
+Simple summary: PATE trains many teachers on disjoint private data partitions and transfers only noisy aggregated answers to a student. This lets the student learn while giving differential privacy guarantees.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://arxiv.org/abs/1802.08908}{\nolinkurl{https://arxiv.org/abs/1802.08908}}\par
+\textcolor{blue}{\textbf{Link:}} \href{https://github.com/tensorflow/privacy}{\nolinkurl{https://github.com/tensorflow/privacy}} (TensorFlow Privacy repo)\par
+
+\subsection*{22. G-PATE}
+Type: Privacy-preserving generative KD\par
+\textbf{KD map:} F10 Privacy-preserving KD; F9 Data-free KD.\par
+Simple summary: G-PATE extends PATE ideas to train a differentially private data generator. Teacher discriminators privately guide a student generator while preserving privacy of the real data.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://arxiv.org/abs/1906.09338}{\nolinkurl{https://arxiv.org/abs/1906.09338}}\par
+\textcolor{blue}{\textbf{Link:}} \href{https://github.com/AI-secure/G-PATE}{\nolinkurl{https://github.com/AI-secure/G-PATE}}\par
+
+\subsection*{23. DistilBERT}
+Type: Transformer/BERT pretraining KD\par
+\textbf{KD map:} F12 Transformer/BERT KD; F1 Response/logit KD.\par
+Simple summary: DistilBERT compresses BERT during pretraining using a triple loss: language modeling, distillation and cosine-distance losses. It keeps much of BERT's performance with fewer parameters and faster inference.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://arxiv.org/abs/1910.01108}{\nolinkurl{https://arxiv.org/abs/1910.01108}}\par
+\textcolor{blue}{\textbf{Link:}} \href{https://github.com/huggingface/transformers/blob/main/docs/source/en/model_doc/distilbert.md}{\nolinkurl{https://github.com/huggingface/transformers/blob/main/docs/source/en/model_doc/distilbert.md}}\par
+
+\subsection*{24. TinyBERT}
+Type: Transformer KD at pretraining and task stages\par
+\textbf{KD map:} F12 Transformer/BERT KD; F1 Response/logit KD; F2 Feature KD; F3 Attention KD.\par
+Simple summary: TinyBERT distills BERT in two stages: general distillation before task fine-tuning and task-specific distillation after. It transfers embeddings, hidden states, attention and predictions.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://aclanthology.org/2020.findings-emnlp.372/}{\nolinkurl{https://aclanthology.org/2020.findings-emnlp.372/}}\par
+\textcolor{blue}{\textbf{Link:}} \href{https://github.com/huawei-noah/Pretrained-Language-Model/tree/master/TinyBERT}{\nolinkurl{https://github.com/huawei-noah/Pretrained-Language-Model/tree/master/TinyBERT}}\par
+
+\subsection*{25. Patient Knowledge Distillation for BERT (BERT-PKD)}
+Type: Intermediate-layer BERT KD\par
+\textbf{KD map:} F12 Transformer/BERT KD; F2 Feature KD.\par
+Simple summary: BERT-PKD teaches a smaller BERT-like student to patiently learn from multiple intermediate teacher layers, not only final outputs. It helps preserve language representations during compression.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://arxiv.org/abs/1908.09355}{\nolinkurl{https://arxiv.org/abs/1908.09355}}\par
+\textcolor{blue}{\textbf{Link:}} \href{https://github.com/intersun/PKD-for-BERT-Model-Compression}{\nolinkurl{https://github.com/intersun/PKD-for-BERT-Model-Compression}}\par
+
+\subsection*{26. MobileBERT}
+Type: Mobile-friendly BERT KD\par
+\textbf{KD map:} F12 Transformer/BERT KD; F1 Response/logit KD; F2 Feature KD.\par
+Simple summary: MobileBERT designs a thin BERT architecture and trains it through knowledge transfer from a specially designed large teacher. The goal is strong NLP performance on resource-limited devices.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://arxiv.org/abs/2004.02984}{\nolinkurl{https://arxiv.org/abs/2004.02984}}\par
+\textcolor{blue}{\textbf{Link:}} \href{https://github.com/google-research/google-research/tree/master/mobilebert}{\nolinkurl{https://github.com/google-research/google-research/tree/master/mobilebert}}\par
+
+\subsection*{27. MiniLM and MiniLMv2}
+Type: Self-attention relation KD for language models\par
+\textbf{KD map:} F12 Transformer/BERT KD; F4 Relational KD; F3 Attention KD.\par
+Simple summary: MiniLM distills deep self-attention knowledge from a large Transformer into a smaller one. MiniLMv2 improves this by transferring multi-head self-attention relations more generally.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://arxiv.org/abs/2002.10957}{\nolinkurl{https://arxiv.org/abs/2002.10957}}\par
+\textcolor{blue}{\textbf{Link:}} \href{https://github.com/microsoft/unilm/tree/master/minilm}{\nolinkurl{https://github.com/microsoft/unilm/tree/master/minilm}}\par
+
+\subsection*{28. DynaBERT}
+Type: Dynamic-width/depth BERT KD\par
+\textbf{KD map:} F12 Transformer/BERT KD; F1 Response/logit KD; F2 Feature KD.\par
+Simple summary: DynaBERT trains one BERT-like model that can run at different widths and depths. Distillation helps the smaller sub-networks keep performance under different latency constraints.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://arxiv.org/abs/2004.04037}{\nolinkurl{https://arxiv.org/abs/2004.04037}}\par
+\textcolor{blue}{\textbf{Link:}} \href{https://github.com/huawei-noah/Pretrained-Language-Model/tree/master/DynaBERT}{\nolinkurl{https://github.com/huawei-noah/Pretrained-Language-Model/tree/master/DynaBERT}}\par
+
+\subsection*{29. BERT-of-Theseus}
+Type: Progressive module replacement\par
+\textbf{KD map:} F12 Transformer/BERT KD.\par
+Simple summary: This approach divides BERT into modules and gradually replaces original modules with compact substitutes. The smaller modules learn to behave like the original BERT without a separate KD loss.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://arxiv.org/abs/2002.02925}{\nolinkurl{https://arxiv.org/abs/2002.02925}}\par
+\textcolor{blue}{\textbf{Link:}} \href{https://github.com/JetRunner/BERT-of-Theseus}{\nolinkurl{https://github.com/JetRunner/BERT-of-Theseus}}\par
+
+\subsection*{30. Distilling Step-by-Step}
+Type: Rationale / explanation KD\par
+\textbf{KD map:} F15 Rationale/reasoning KD; F13 LLM black-box KD.\par
+Simple summary: This method trains smaller models with both final labels and rationales generated by a large language model. The key idea is that explanations can reduce the amount of training data needed.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://arxiv.org/abs/2305.02301}{\nolinkurl{https://arxiv.org/abs/2305.02301}}\par
+\textcolor{blue}{\textbf{Link:}} \href{https://github.com/google-research/distilling-step-by-step}{\nolinkurl{https://github.com/google-research/distilling-step-by-step}}\par
+
+\subsection*{31. Self-Instruct}
+Type: Instruction-data generation / self-generated supervision\par
+\textbf{KD map:} F13 LLM black-box KD / instruction-data generation workflow.\par
+Simple summary: Self-Instruct asks a model to create new tasks, inputs and outputs, filters them, then uses them for instruction tuning. It is not classic KD but it is central to modern data-generation-based distillation workflows.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://arxiv.org/abs/2212.10560}{\nolinkurl{https://arxiv.org/abs/2212.10560}}\par
+\textcolor{blue}{\textbf{Link:}} \href{https://github.com/yizhongw/self-instruct}{\nolinkurl{https://github.com/yizhongw/self-instruct}}\par
+
+\subsection*{32. Stanford Alpaca}
+Type: Instruction distillation from text-davinci-003 style data\par
+\textbf{KD map:} F13 LLM black-box KD / instruction distillation.\par
+Simple summary: Alpaca fine-tuned LLaMA 7B on 52K instruction-following examples generated using the Self-Instruct style with text-davinci-003. It showed that a small open model could imitate many instruction-following behaviors.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://crfm.stanford.edu/2023/03/13/alpaca.html}{\nolinkurl{https://crfm.stanford.edu/2023/03/13/alpaca.html}}\par
+\textcolor{blue}{\textbf{Link:}} \href{https://github.com/tatsu-lab/stanford_alpaca}{\nolinkurl{https://github.com/tatsu-lab/stanford_alpaca}}\par
+
+\subsection*{33. Orca}
+Type: Explanation-trace distillation from GPT-4/ChatGPT\par
+\textbf{KD map:} F15 Rationale/reasoning KD; F13 LLM black-box KD.\par
+Simple summary: Orca trains a 13B model to learn from richer teacher signals such as explanation traces and step-by-step reasoning. It is a key example of reasoning-skill distillation from frontier models.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://arxiv.org/abs/2306.02707}{\nolinkurl{https://arxiv.org/abs/2306.02707}}\par
+\textcolor{blue}{\textbf{Link:}} No verified official public GitHub repo found.\par
+
+\subsection*{34. MiniLLM}
+Type: White-box LLM KD with reverse KL / on-policy learning\par
+\textbf{KD map:} F14 LLM white-box/on-policy KD.\par
+Simple summary: MiniLLM argues that standard forward KL is not ideal for generative LLMs. It uses reverse KL and an RL-style optimization approach so the student learns sharper, higher-quality generation behavior.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://arxiv.org/abs/2306.08543}{\nolinkurl{https://arxiv.org/abs/2306.08543}}\par
+\textcolor{blue}{\textbf{Link:}} \href{https://github.com/microsoft/LMOps/tree/main/minillm}{\nolinkurl{https://github.com/microsoft/LMOps/tree/main/minillm}}\par
+
+\subsection*{35. Generalized Knowledge Distillation (GKD)}
+Type: On-policy KD for autoregressive language models\par
+\textbf{KD map:} F14 LLM white-box/on-policy KD.\par
+Simple summary: GKD targets the distribution mismatch that happens when a student is trained only on teacher-generated data. It lets the student learn from its own generated states while still using teacher guidance.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://openreview.net/forum?id=3zKtaqxLhW}{\nolinkurl{https://openreview.net/forum?id=3zKtaqxLhW}}\par
+\textcolor{blue}{\textbf{Link:}} \href{https://github.com/huggingface/trl/blob/main/docs/source/gkd_trainer.md}{\nolinkurl{https://github.com/huggingface/trl/blob/main/docs/source/gkd_trainer.md}}\par
+
+\subsection*{36. Proxy-KD}
+Type: Black-box LLM KD with a proxy model\par
+\textbf{KD map:} F13 LLM black-box KD.\par
+Simple summary: Proxy-KD uses an accessible proxy model between a closed teacher API and the final student. The proxy first learns from the black-box teacher, then helps transfer knowledge more efficiently.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://arxiv.org/abs/2401.07013}{\nolinkurl{https://arxiv.org/abs/2401.07013}}\par
+\textcolor{blue}{\textbf{Link:}} No verified official public GitHub repo found.\par
+
+\subsection*{37. Generative Adversarial Distillation (GAD)}
+Type: Black-box on-policy LLM KD\par
+\textbf{KD map:} F13 LLM black-box KD.\par
+Simple summary: GAD treats the student like a generator and trains a discriminator/reward model to tell teacher text from student text. The student learns on-policy without needing teacher probabilities.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://ytianzhu.github.io/Generative-Adversarial-Distillation/}{\nolinkurl{https://ytianzhu.github.io/Generative-Adversarial-Distillation/}}\par
+\textcolor{blue}{\textbf{Link:}} No verified official public GitHub repo found from the project page.\par
+
+\subsection*{38. EasyDistill}
+Type: LLM KD toolkit\par
+\textbf{KD map:} F18 Toolkit; F13 LLM black-box KD; F14 LLM white-box KD.\par
+Simple summary: EasyDistill is a toolkit for black-box and white-box LLM distillation. It supports data synthesis, supervised fine-tuning, ranking optimization and reinforcement-learning-style KD workflows.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://arxiv.org/abs/2505.20888}{\nolinkurl{https://arxiv.org/abs/2505.20888}}\par
+\textcolor{blue}{\textbf{Link:}} \href{https://github.com/modelscope/easydistill}{\nolinkurl{https://github.com/modelscope/easydistill}}\par
+
+\subsection*{39. DeepSeek-R1-Distill Models}
+Type: Reasoning-model distillation into Qwen/Llama\par
+\textbf{KD map:} F15 Rationale/reasoning KD; F12 Transformer/LLM KD.\par
+Simple summary: DeepSeek released distilled dense models based on Qwen and Llama, trained using samples generated by DeepSeek-R1. This is one of the best-known modern examples of reasoning distillation.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://github.com/deepseek-ai/DeepSeek-R1/blob/main/DeepSeek_R1.pdf}{\nolinkurl{https://github.com/deepseek-ai/DeepSeek-R1/blob/main/DeepSeek_R1.pdf}}\par
+\textcolor{blue}{\textbf{Link:}} \href{https://github.com/deepseek-ai/DeepSeek-R1}{\nolinkurl{https://github.com/deepseek-ai/DeepSeek-R1}}\par
+
+\subsection*{40. Hugging Face Open-R1}
+Type: Open reproduction workflow for R1-style distillation\par
+\textbf{KD map:} F18 Toolkit/reproduction repo; F15 Rationale/reasoning KD.\par
+Simple summary: Open-R1 is a community/open reproduction project. One of its planned steps is to replicate R1-Distill-style models by distilling a high-quality corpus from DeepSeek-R1.\par
+\textcolor{blue}{\textbf{Paper:}} Project/reproduction repo, not a peer-reviewed paper.\par
+\textcolor{blue}{\textbf{Link:}} \href{https://github.com/huggingface/open-r1}{\nolinkurl{https://github.com/huggingface/open-r1}}\par
+
+\subsection*{41. Qwen3.5-27B-Claude-4.6-Opus-Reasoning-Distilled}
+Type: Community model-card example, not official paper\par
+\textbf{KD map:} F15 Rationale/reasoning KD; F13 LLM black-box KD claim.\par
+Simple summary: This Hugging Face model card claims a Qwen3.5-based model was fine-tuned with reasoning trajectories sourced from Claude-4.6 Opus interactions. Treat it as a community model-card claim, not a peer-reviewed paper or official Alibaba/Qwen release.\par
+\textcolor{blue}{\textbf{Paper:}} No peer-reviewed paper verified.\par
+\textcolor{blue}{\textbf{Link:}} \href{https://huggingface.co/Jackrong/Qwen3.5-27B-Claude-4.6-Opus-Reasoning-Distilled}{\nolinkurl{https://huggingface.co/Jackrong/Qwen3.5-27B-Claude-4.6-Opus-Reasoning-Distilled}} (Model card)\par
+
+\subsection*{42. Data-Efficient Image Transformers (DeiT)}
+Type: Vision Transformer KD\par
+\textbf{KD map:} F16 Vision KD; F3 Attention KD; F12 Transformer/ViT KD.\par
+Simple summary: DeiT introduced a transformer-specific distillation token, letting a Vision Transformer learn from a CNN teacher. This helped ViTs train well on ImageNet without massive external datasets.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://arxiv.org/abs/2012.12877}{\nolinkurl{https://arxiv.org/abs/2012.12877}}\par
+\textcolor{blue}{\textbf{Link:}} \href{https://github.com/facebookresearch/deit}{\nolinkurl{https://github.com/facebookresearch/deit}}\par
+
+\subsection*{43. Focal and Global Knowledge Distillation for Detectors (FGD)}
+Type: Object detection KD\par
+\textbf{KD map:} F16 Detection KD; F3 Attention KD; F4 Relational KD.\par
+Simple summary: FGD adapts KD to object detection by focusing on important foreground/background regions and global relations. It is designed because detection is harder than image classification distillation.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://arxiv.org/abs/2111.11837}{\nolinkurl{https://arxiv.org/abs/2111.11837}}\par
+\textcolor{blue}{\textbf{Link:}} \href{https://github.com/yzd-v/FGD}{\nolinkurl{https://github.com/yzd-v/FGD}}\par
+
+\subsection*{44. Channel-Wise Knowledge Distillation for Dense Prediction}
+Type: Semantic segmentation / dense prediction KD\par
+\textbf{KD map:} F16 Segmentation/dense prediction KD; F2 Feature KD.\par
+Simple summary: This method distills channel-wise probability maps between teacher and student feature maps. It is useful for dense tasks like segmentation, where every pixel/location matters.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://arxiv.org/abs/2011.13256}{\nolinkurl{https://arxiv.org/abs/2011.13256}}\par
+\textcolor{blue}{\textbf{Link:}} \href{https://github.com/drilistbox/CWD}{\nolinkurl{https://github.com/drilistbox/CWD}}\par
+
+\subsection*{45. Structured Knowledge Distillation for Semantic Segmentation}
+Type: Structured dense prediction KD\par
+\textbf{KD map:} F16 Segmentation/dense prediction KD; F4 Structural KD.\par
+Simple summary: This paper transfers structured knowledge for segmentation instead of only pixel-wise labels. The student learns spatial and pairwise structure from the teacher.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://arxiv.org/abs/1903.04197}{\nolinkurl{https://arxiv.org/abs/1903.04197}}\par
+\textcolor{blue}{\textbf{Link:}} \href{https://github.com/irfanICMLL/structure_knowledge_distillation}{\nolinkurl{https://github.com/irfanICMLL/structure_knowledge_distillation}}\par
+
+\subsection*{46. Progressive Distillation for Fast Diffusion Sampling}
+Type: Diffusion sampler distillation\par
+\textbf{KD map:} F17 Diffusion-model KD.\par
+Simple summary: This paper distills a many-step diffusion sampler into a faster sampler by repeatedly halving the number of steps. It showed diffusion models could sample in very few steps with limited quality loss.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://arxiv.org/abs/2202.00512}{\nolinkurl{https://arxiv.org/abs/2202.00512}}\par
+\textcolor{blue}{\textbf{Link:}} \href{https://github.com/Hramchenko/diffusion_distiller}{\nolinkurl{https://github.com/Hramchenko/diffusion_distiller}} (Unofficial implementation)\par
+
+\subsection*{47. On Distillation of Guided Diffusion Models}
+Type: Classifier-free guidance diffusion KD\par
+\textbf{KD map:} F17 Diffusion-model KD.\par
+Simple summary: This work distills classifier-free guided diffusion models into faster models. It is important for speeding up text-to-image or guided generation while keeping visual quality.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://openaccess.thecvf.com/content/CVPR2023/papers/Meng_On_Distillation_of_Guided_Diffusion_Models_CVPR_2023_paper.pdf}{\nolinkurl{https://openaccess.thecvf.com/content/CVPR2023/papers/Meng_On_Distillation_of_Guided_Diffusion_Models_CVPR_2023_paper.pdf}}\par
+\textcolor{blue}{\textbf{Link:}} \href{https://github.com/ruiqixu37/distill_diffusion}{\nolinkurl{https://github.com/ruiqixu37/distill_diffusion}} (Unofficial implementation)\par
+
+\subsection*{48. Consistency Models}
+Type: Diffusion distillation / one-step generation\par
+\textbf{KD map:} F17 Diffusion-model KD.\par
+Simple summary: Consistency models can be trained by distilling a pretrained diffusion model or trained standalone. They support high-quality one-step or few-step generation and became a major direction for fast generative models.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://arxiv.org/abs/2303.01469}{\nolinkurl{https://arxiv.org/abs/2303.01469}}\par
+\textcolor{blue}{\textbf{Link:}} \href{https://github.com/openai/consistency_models}{\nolinkurl{https://github.com/openai/consistency_models}}\par
+
+\subsection*{49. Latent Consistency Models (LCM)}
+Type: Latent diffusion distillation\par
+\textbf{KD map:} F17 Diffusion-model KD.\par
+Simple summary: LCM distills Stable-Diffusion-style latent diffusion models so they can generate images in only a few steps. It is widely used for faster text-to-image inference.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://latent-consistency-models.github.io/}{\nolinkurl{https://latent-consistency-models.github.io/}}\par
+\textcolor{blue}{\textbf{Link:}} \href{https://github.com/luosiallen/latent-consistency-model}{\nolinkurl{https://github.com/luosiallen/latent-consistency-model}}\par
+
+\subsection*{50. TorchDistill}
+Type: KD framework / reusable toolkit\par
+\textbf{KD map:} F18 Toolkit.\par
+Simple summary: TorchDistill is a configurable framework that implements many KD methods across vision tasks. It is useful when you want to experiment without rewriting every method from scratch.\par
+\textcolor{blue}{\textbf{Paper:}} Toolkit repository, not one single KD paper.\par
+\textcolor{blue}{\textbf{Link:}} \href{https://github.com/yoshitomo-matsubara/torchdistill}{\nolinkurl{https://github.com/yoshitomo-matsubara/torchdistill}}\par
+
+\subsection*{51. MDistiller}
+Type: KD benchmark library and DKD implementation\par
+\textbf{KD map:} F18 Benchmark toolkit; F1 Response/logit KD; F2 Feature KD.\par
+Simple summary: MDistiller provides classical KD algorithms on standard computer-vision benchmarks and is also the official implementation for DKD. It is useful for comparing many KD methods fairly.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://arxiv.org/abs/2203.08679}{\nolinkurl{https://arxiv.org/abs/2203.08679}} (DKD paper)\par
+\textcolor{blue}{\textbf{Link:}} \href{https://github.com/megvii-research/mdistiller}{\nolinkurl{https://github.com/megvii-research/mdistiller}}\par
+
+\subsection*{52. Awesome Knowledge Distillation of LLMs}
+Type: Curated LLM KD reading list\par
+\textbf{KD map:} F18 Reading-list repo / LLM KD resource.\par
+Simple summary: This repository supports a survey on KD for LLMs and organizes LLM KD by algorithm, skill and vertical application. It is a good place to find newer papers after reading this guide.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://arxiv.org/abs/2402.13116}{\nolinkurl{https://arxiv.org/abs/2402.13116}}\par
+\textcolor{blue}{\textbf{Link:}} \href{https://github.com/Tebmer/Awesome-Knowledge-Distillation-of-LLMs}{\nolinkurl{https://github.com/Tebmer/Awesome-Knowledge-Distillation-of-LLMs}}\par
+
+\subsection*{53. Knowledge Distillation Paper List}
+Type: Curated general KD reading list\par
+\textbf{KD map:} F18 Reading-list repo / general KD resource.\par
+Simple summary: This is a broad reading list of KD papers across pioneering papers, feature distillation, online KD, data-free KD, segmentation, diffusion and other areas.\par
+\textcolor{blue}{\textbf{Paper:}} Collection, not a single paper.\par
+\textcolor{blue}{\textbf{Link:}} \href{https://github.com/DefangChen/Knowledge-Distillation-Paper}{\nolinkurl{https://github.com/DefangChen/Knowledge-Distillation-Paper}}\par
+
+\subsection*{54. KD Survey Repository}
+Type: Survey companion / taxonomy resource\par
+\textbf{KD map:} F18 Survey companion / taxonomy resource.\par
+Simple summary: This survey repo organizes KD into response-based, feature-based and relation-based categories and links broader survey material. Useful for building your own reading roadmap.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://arxiv.org/abs/2503.12067}{\nolinkurl{https://arxiv.org/abs/2503.12067}}\par
+\textcolor{blue}{\textbf{Link:}} \href{https://github.com/IPL-sharif/KD_Survey}{\nolinkurl{https://github.com/IPL-sharif/KD_Survey}}\par
+
+
+
+\section*{Recommended survey papers}
+
+These survey papers are the main source links behind the taxonomy above. The detailed 54 entries later in this document provide representative papers, repos and model examples for those forms.\par
+
+\begin{itemize}
+
+\item \textbf{Knowledge Distillation: A Survey}\par
+A very useful starting survey for understanding response-based KD, feature-based KD, relation-based KD, teacher-student architecture, training schemes and applications.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://arxiv.org/abs/2006.05525}{\textcolor{blue}{\nolinkurl{https://arxiv.org/abs/2006.05525}}}
+
+\item \textbf{Categories of Response-Based, Feature-Based and Relation-Based Knowledge Distillation}\par
+A survey-style taxonomy source that clearly organizes KD into response-based, feature-based and relation-based categories and also discusses offline KD, online KD, self-KD, multi-teacher KD, cross-modal KD, attention-based KD, data-free KD and adversarial KD.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://arxiv.org/abs/2306.10687}{\textcolor{blue}{\nolinkurl{https://arxiv.org/abs/2306.10687}}}
+
+\item \textbf{A Survey on Knowledge Distillation: Recent Advancements}\par
+This survey gives a broader and more recent overview of KD, including self-distillation, data-free KD, cross-modal KD, privacy-preserving KD, quantization-related KD and practical applications.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://www.sciencedirect.com/science/article/pii/S2666827024000811}{\textcolor{blue}{\nolinkurl{https://www.sciencedirect.com/science/article/pii/S2666827024000811}}}
+
+\item \textbf{Survey on Knowledge Distillation for Large Language Models: Methods, Evaluation and Application}\par
+This survey focuses on KD for large language models. It explains black-box KD, white-box KD, instruction distillation, reasoning distillation and how smaller LLMs learn from larger LLMs.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://arxiv.org/abs/2407.01885}{\textcolor{blue}{\nolinkurl{https://arxiv.org/abs/2407.01885}}}
+
+\item \textbf{A Survey on Knowledge Distillation of Large Language Models}\par
+This paper discusses how LLM knowledge is transferred through generated data, task-specific outputs, reasoning traces, alignment data and model compression techniques.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://arxiv.org/abs/2402.13116}{\textcolor{blue}{\nolinkurl{https://arxiv.org/abs/2402.13116}}}
+
+\item \textbf{A Comprehensive Survey on Knowledge Distillation}\par
+A recent broad survey resource that can help readers connect classical KD, modern KD, applications and taxonomy-level thinking.\par
+\textcolor{blue}{\textbf{Paper:}} \href{https://arxiv.org/abs/2503.12067}{\textcolor{blue}{\nolinkurl{https://arxiv.org/abs/2503.12067}}}
+
+\end{itemize}
+
+
+\end{document}
